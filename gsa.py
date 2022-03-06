@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
 import numpy as np
 import benchmarks
+from datetime import datetime
 
 class GSA:
   def __init__(self, benchmark, pop_size=30, iter_num=100, dim=30, distance=10, seed=None):
@@ -179,7 +180,14 @@ class GSA:
 
     ani = animation.FuncAnimation(fig, update, generate_points, interval=300, save_count=save_count, repeat=False)
     if save:
-      ani.save('animation.gif', fps=4, writer='imagemagick')
+
+      # datetime object containing current date and time
+      now = datetime.now()
+
+      # dd/mm/YY H:M:S
+      dt_string = now.strftime("%d-%m-%Y-%H:%M:%S")
+      ax.title('GSA (Ackley)')
+      ani.save('animation' + dt_string + 'ackley' + '.gif', fps=15, writer='imagemagick')
     else:
       plt.show()
 

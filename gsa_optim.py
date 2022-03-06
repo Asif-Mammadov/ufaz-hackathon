@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
 import numpy as np
 import benchmarks
+from datetime import datetime
 
 class GSAOptim:
   def __init__(self, benchmark, pop_size=30, iter_num=100, dim=3, distance=10, imp_type=None, seed=None):
@@ -19,9 +20,11 @@ class GSAOptim:
     self.pop_size = pop_size
     self.v = np.zeros((self.pop_size, self.dim))
     self.lastbest = None
-    self.realbest = None
+    self.curbest = None
     self.iter = 0
     self.avg = []
+    self.median = []
+    self.std = []
     self.bests = []
     self.imp_type = imp_type
 
@@ -89,16 +92,16 @@ class GSAOptim:
   def improve(self):
     # Use the best-so-far methods to improve the algorithm
     best = self.find_best()
-    if self.realbest is None or best < self.realbest:
-      self.realbest = best
+    if self.curbest is None or best < self.curbest:
+      self.curbest = best
     else:
       if self.imp_type == 1:
-        self.worst = self.realbest
+        self.worst = self.curbest
       elif self.imp_type == 2:
-        self.best = self.realbest
+        self.best = self.curbest
       elif self.imp_type == 3:
         index = int(np.random.rand() * len(self.fit_values))
-        self.fit_values[index] = self.realbest
+        self.fit_values[index] = self.curbest
 
   def update_lastbest(self):
     # Save the last best solution before next iteration
@@ -125,6 +128,8 @@ class GSAOptim:
     self.iter += 1
     self.update_lastbest()
     self.avg.append(self.fit_values.mean())
+    self.std.append(self.fit_values.std())
+    self.median.append(np.median(self.fit_values))
     self.bests.append(self.lastbest)
     return self.X.T
 
@@ -136,7 +141,7 @@ class GSAOptim:
     print("Distance", self.distance)
     while self.iter < self.iter_num:
       self.run_tmp()
-    return self.avg, self.bests 
+    return self.avg, self.median, self.std, self.bests 
 
   def animate(self, save=False, save_count=100):
     def update(data):
@@ -156,7 +161,7 @@ class GSAOptim:
       
       ax.set_xlim(xlow, xhigh)
       ax.set_ylim(ylow, yhigh)
-      title = ax.text(0.5,0.85, "iter " + str(self.iter), bbox={'facecolor':'w',  'pad':5},
+      title = ax.text(0.5,0.85, "Shwefel. Iteration: " + str(self.iter), bbox={'facecolor':'w',  'pad':5},
                       transform=ax.transAxes, ha="center")
       return points
 
@@ -181,6 +186,12 @@ class GSAOptim:
 
     ani = animation.FuncAnimation(fig, update, generate_points, interval=300, save_count=save_count, repeat=False)
     if save:
-      ani.save('animation.gif', fps=4, writer='imagemagick')
+
+      # datetime object containing current date and time
+      now = datetime.now()
+
+      # dd/mm/YY H:M:S
+      dt_string = now.strftime("%d-%m-%Y-%H:%M:%S")
+      ani.save('animation' + dt_string + 'shwefel' + '.gif', fps=8, writer='imagemagick')
     else:
       plt.show()
