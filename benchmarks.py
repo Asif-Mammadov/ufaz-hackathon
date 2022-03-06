@@ -19,20 +19,20 @@ def rastrigin(X):
   y = 10 * d + sum
   return y
 
-# def rosenbrock_test(X):
-#   # https://www.sfu.ca/~ssurjano/Code/rosenr.html
-#   X = X.astype('float')
-#   d = len(X)
-#   xi = X[1:d-1]
-#   xnext = X[2:d]
-#   sum = np.sum(100 * (xnext - xi ** 2) ** 2 + (xi-1) ** 2 )
-#   return sum
+def rosenbrock(X):
+  # https://www.sfu.ca/~ssurjano/Code/rosenr.html
+  X = X.astype('float')
+  d = len(X)
+  xi = X[1:d-1]
+  xnext = X[2:d]
+  sum = np.sum(100 * (xnext - xi ** 2) ** 2 + (xi-1) ** 2 )
+  return sum
 
-def rosenbrock(args):
-  x, y = args
-  a = 1
-  b = 100
-  return (a - x) ** 2 + b * (y - x ** 2) ** 2
+# def rosenbrock(args):
+#   x, y = args
+#   a = 1
+#   b = 100
+#   return (a - x) ** 2 + b * (y - x ** 2) ** 2
 
 def schwefel(X):
   # https://www.sfu.ca/~ssurjano/Code/schwefr.html

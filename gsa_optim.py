@@ -1,4 +1,3 @@
-from matplotlib.collections import BrokenBarHCollection
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
@@ -6,8 +5,8 @@ from matplotlib.colors import to_hex
 import numpy as np
 import benchmarks
 
-class GSA:
-  def __init__(self, benchmark, pop_size=30, iter_num=100, dim=30, distance=10, seed=None):
+class GSAOptim:
+  def __init__(self, benchmark, pop_size=30, iter_num=100, dim=3, distance=10, imp_type=None, seed=None):
     if seed is not None:
       np.random.seed(seed)
     self.X = np.random.rand(pop_size, dim) * distance
@@ -20,9 +19,11 @@ class GSA:
     self.pop_size = pop_size
     self.v = np.zeros((self.pop_size, self.dim))
     self.lastbest = None
+    self.realbest = None
     self.iter = 0
     self.avg = []
     self.bests = []
+    self.imp_type = imp_type
 
   def fit(self):
     # Create fit values from the set
@@ -35,12 +36,10 @@ class GSA:
   def find_best(self):
     # Calculate the best - min of fit values
     return np.min(self.fit_values)
-    # return self.best
 
   def find_worst(self):
     # Calculate the worst - max of fit values
     return np.max(self.fit_values)
-    # return self.worst
 
   def find_G(self, t):
     # Calculate the gravitational constant
@@ -86,7 +85,21 @@ class GSA:
   def find_pos(self):
     # Set values for particle position
     self.X = self.X + self.v
-    
+
+  def improve(self):
+    # Use the best-so-far methods to improve the algorithm
+    best = self.find_best()
+    if self.realbest is None or best < self.realbest:
+      self.realbest = best
+    else:
+      if self.imp_type == 1:
+        self.worst = self.realbest
+      elif self.imp_type == 2:
+        self.best = self.realbest
+      elif self.imp_type == 3:
+        index = int(np.random.rand() * len(self.fit_values))
+        self.fit_values[index] = self.realbest
+
   def update_lastbest(self):
     # Save the last best solution before next iteration
     best = np.min(self.fit_values)
@@ -106,6 +119,8 @@ class GSA:
     self.find_accel()
     self.find_velocity()
     self.find_pos()
+    if self.imp_type is not None:
+      self.improve()
 
     self.iter += 1
     self.update_lastbest()
@@ -114,7 +129,7 @@ class GSA:
     return self.X.T
 
   def run(self):
-    print("GSA Original")
+    print("GSA Optim")
     print("Pop_size:", self.pop_size)
     print("Iter num:", self.iter_num)
     print("Dimension:", self.dim)
@@ -122,19 +137,6 @@ class GSA:
     while self.iter < self.iter_num:
       self.run_tmp()
     return self.avg, self.bests 
-
-    #   XT = self.X.T
-    #   self.fit(rosenbrock)
-    #   self.find_best()
-    #   self.find_worst()
-    #   self.find_G(0)
-    #   self.find_mass()
-    #   self.find_inertia_mass()
-    #   self.find_force()
-    #   self.find_accel()
-    #   self.find_velocity()
-    #   self.find_pos()
-    #   self.update_lastbest()
 
   def animate(self, save=False, save_count=100):
     def update(data):
@@ -182,6 +184,3 @@ class GSA:
       ani.save('animation.gif', fps=4, writer='imagemagick')
     else:
       plt.show()
-
-
-

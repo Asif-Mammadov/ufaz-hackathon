@@ -1,8 +1,8 @@
 import benchmarks
-from gsa import GSA
+from gsa_optim import GSAOptim
 
 # X = np.random.rand(100, 2) * 300
-a = GSA(benchmark=benchmarks.ackley, iter_num=20, distance=10, pop_size=20)
+a = GSAOptim(benchmark=benchmarks.ackley, iter_num=20, distance=10, pop_size=20)
 # avg, bests = a.run()
 
 # fig, ax = plt.subplots(2)
