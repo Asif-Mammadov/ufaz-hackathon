@@ -169,9 +169,9 @@ def rosenbrock(args):
   b = 100
   return (a - x) ** 2 + b * (y - x ** 2) ** 2
 
-X = np.random.rand(20, 2) * 100
+X = np.random.rand(100, 2) * 300
 a = GSA(X, benchmark=rosenbrock, iter_num=100)
-a.run()
-# a.animate()
+# a.run()
+a.animate(save=True)
 
 
